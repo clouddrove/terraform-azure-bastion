@@ -12,45 +12,42 @@ module "resource_group" {
   location    = "Canada Central"
 }
 
-#Vnet
-module "virtual_network" {
-  depends_on = [module.resource_group]
-  source     = "clouddrove/virtual-network/azure"
-  version    = "1.0.4"
-
-  name        = "app"
-  environment = "test"
-  label_order = ["name", "environment"]
-
+module "vnet" {
+  source              = "clouddrove/vnet/azure"
+  version             = "1.0.0"
+  name                = "app"
+  environment         = "test"
+  label_order         = ["name", "environment"]
   resource_group_name = module.resource_group.resource_group_name
   location            = module.resource_group.resource_group_location
   address_space       = "10.0.0.0/16"
   enable_ddos_pp      = false
+}
+
+module "name_specific_subnet" {
+  source               = "clouddrove/subnet/azure"
+  version              = "1.0.0"
+  name                 = "app"
+  environment          = "test"
+  label_order          = ["name", "environment"]
+  resource_group_name  = module.resource_group.resource_group_name
+  location             = module.resource_group.resource_group_location
+  virtual_network_name = join("", module.vnet.vnet_name)
 
   #subnet
-  default_name_subnet           = true
-  subnet_names                  = ["subnet1"]
-  subnet_prefixes               = ["10.0.1.0/24"]
-  disable_bgp_route_propagation = false
+  specific_name_subnet  = true
+  specific_subnet_names = "AzureBastionSubnet"
+  subnet_prefixes       = ["10.0.1.0/24"]
 
-  # routes
-  enabled_route_table = false
-  routes = [
-    {
-      name           = "rt-test"
-      address_prefix = "0.0.0.0/0"
-      next_hop_type  = "Internet"
-    }
-  ]
 }
 
 module "bastion" {
-  depends_on                          = [module.resource_group]
-  source                              = "./../"
-  name                                = "app"
-  environment                         = "test"
-  label_order                         = ["name", "environment"]
-  resource_group_name                 = module.resource_group.resource_group_name
-  azure_bastion_subnet_address_prefix = ["10.0.5.0/24"]
-  virtual_network_name                = module.virtual_network.vnet_name[0]
+  depends_on           = [module.resource_group]
+  source               = "./../"
+  name                 = "app"
+  environment          = "test"
+  label_order          = ["name", "environment"]
+  resource_group_name  = module.resource_group.resource_group_name
+  virtual_network_name = module.vnet.vnet_name[0]
+  subnet_id            = module.name_specific_subnet.specific_subnet_id[0]
 }

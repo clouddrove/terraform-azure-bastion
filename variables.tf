@@ -121,3 +121,8 @@ variable "ddos_protection_mode" {
   default     = "VirtualNetworkInherited"
   description = "The DDoS protection mode of the public IP"
 }
+variable "subnet_id" {
+  type        = string
+  default     = ""
+  description = "The ID of the Subnet where this Network Interface should be located in."
+}

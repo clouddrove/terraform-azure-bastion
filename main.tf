@@ -32,13 +32,6 @@ resource "azurerm_public_ip" "pip" {
   tags                 = module.labels.tags
 }
 
-resource "azurerm_subnet" "main" {
-  count                = var.enabled ? 1 : 0
-  name                 = "AzureBastionSubnet"
-  resource_group_name  = local.resource_group_name
-  virtual_network_name = var.virtual_network_name
-  address_prefixes     = var.azure_bastion_subnet_address_prefix
-}
 
 #---------------------------------------------
 # Azure Bastion Service host
@@ -61,7 +54,7 @@ resource "azurerm_bastion_host" "main" {
 
   ip_configuration {
     name                 = format("%s-network", module.labels.id)
-    subnet_id            = join("", azurerm_subnet.main.*.id)
+    subnet_id            = var.subnet_id
     public_ip_address_id = join("", azurerm_public_ip.pip.*.id)
   }
 }
