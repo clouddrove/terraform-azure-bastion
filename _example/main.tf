@@ -48,6 +48,7 @@ module "bastion" {
   environment          = "test"
   label_order          = ["name", "environment"]
   resource_group_name  = module.resource_group.resource_group_name
+  location             = module.resource_group.resource_group_location
   virtual_network_name = module.vnet.vnet_name[0]
   subnet_id            = module.name_specific_subnet.specific_subnet_id[0]
 }

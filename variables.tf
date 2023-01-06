@@ -37,6 +37,12 @@ variable "resource_group_name" {
   description = "A container that holds related resources for an Azure solution"
 }
 
+variable "location" {
+  type        = string
+  default     = ""
+  description = "A location the resources"  
+}
+
 variable "virtual_network_name" {
   type        = string
   default     = ""

@@ -1,12 +1,3 @@
-data "azurerm_resource_group" "default" {
-  name = var.resource_group_name
-}
-
-locals {
-  resource_group_name = data.azurerm_resource_group.default.name
-  location            = data.azurerm_resource_group.default.location
-}
-
 module "labels" {
   source      = "clouddrove/labels/azure"
   version     = "1.0.0"
@@ -24,8 +15,8 @@ module "labels" {
 resource "azurerm_public_ip" "pip" {
   count                = var.enabled ? 1 : 0
   name                 = format("%s-bastion-ip", module.labels.id)
-  location             = local.location
-  resource_group_name  = local.resource_group_name
+  location             = var.location
+  resource_group_name  = var.resource_group_name
   allocation_method    = var.public_ip_allocation_method
   sku                  = var.public_ip_sku
   ddos_protection_mode = var.ddos_protection_mode
@@ -40,8 +31,8 @@ resource "azurerm_bastion_host" "main" {
   count = var.enabled ? 1 : 0
 
   name                   = format("%s-bastion", module.labels.id)
-  location               = local.location
-  resource_group_name    = local.resource_group_name
+  location               = var.location
+  resource_group_name    = var.resource_group_name
   copy_paste_enabled     = var.enable_copy_paste
   file_copy_enabled      = var.bastion_host_sku == "Standard" ? var.enable_file_copy : null
   sku                    = var.bastion_host_sku
