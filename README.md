@@ -79,6 +79,10 @@ Here are some examples of how you can use this module in your inventory structur
   resource_group_name                 = module.resource_group.resource_group_name
   azure_bastion_subnet_address_prefix = ["10.0.5.0/24"]
   virtual_network_name                = module.virtual_network.vnet_name[0]
+
+  #### enable diagnostic setting
+  diagnostic_setting_enable  = false
+  log_analytics_workspace_id = ""
 }
 ```
 
@@ -91,9 +95,13 @@ Here are some examples of how you can use this module in your inventory structur
 
 | Name | Description | Type | Default | Required |
 |------|-------------|------|---------|:--------:|
+| Metric\_enable | Is this Diagnostic Metric enabled? Defaults to true. | `bool` | `true` | no |
 | azure\_bastion\_subnet\_address\_prefix | The address prefix to use for the Azure Bastion subnet | `list(any)` | `[]` | no |
 | bastion\_host\_sku | The SKU of the Bastion Host. Accepted values are `Basic` and `Standard` | `string` | `"Basic"` | no |
+| category | The name of a Diagnostic Log Category Group for this Resource. | `string` | `null` | no |
 | ddos\_protection\_mode | The DDoS protection mode of the public IP | `string` | `"VirtualNetworkInherited"` | no |
+| diagnostic\_log\_days | The number of days for which this Retention Policy should apply. | `number` | `"90"` | no |
+| diagnostic\_setting\_enable | n/a | `bool` | `false` | no |
 | enable\_copy\_paste | Is Copy/Paste feature enabled for the Bastion Host? | `bool` | `true` | no |
 | enable\_file\_copy | Is File Copy feature enabled for the Bastion Host. Only supported whne `sku` is `Standard` | `bool` | `false` | no |
 | enable\_ip\_connect | Is IP Connect feature enabled for the Bastion Host? | `bool` | `false` | no |
@@ -101,15 +109,22 @@ Here are some examples of how you can use this module in your inventory structur
 | enable\_tunneling | Is Tunneling feature enabled for the Bastion Host. Only supported whne `sku` is `Standard` | `bool` | `false` | no |
 | enabled | Set to false to prevent the module from creating any resources. | `bool` | `true` | no |
 | environment | Environment (e.g. `prod`, `dev`, `staging`). | `string` | `""` | no |
+| eventhub\_authorization\_rule\_id | Specifies the ID of an Event Hub Namespace Authorization Rule used to send Diagnostics Data. | `string` | `null` | no |
+| eventhub\_name | Specifies the name of the Event Hub where Diagnostics Data should be sent. | `string` | `null` | no |
 | label\_order | Label order, e.g. sequence of application name and environment `name`,`environment`,'attribute' [`webserver`,`qa`,`devops`,`public`,] . | `list(any)` | `[]` | no |
 | location | A location the resources | `string` | `""` | no |
+| log\_analytics\_destination\_type | Possible values are AzureDiagnostics and Dedicated, default to AzureDiagnostics. When set to Dedicated, logs sent to a Log Analytics workspace will go into resource specific tables, instead of the legacy AzureDiagnostics table. | `string` | `"AzureDiagnostics"` | no |
+| log\_analytics\_workspace\_id | n/a | `string` | `null` | no |
+| log\_enabled | Is this Diagnostic Log enabled? Defaults to true. | `string` | `true` | no |
 | managedby | ManagedBy, eg ''. | `string` | `""` | no |
 | name | Name  (e.g. `app` or `cluster`). | `string` | `""` | no |
 | public\_ip\_allocation\_method | Defines the allocation method for this IP address. Possible values are Static or Dynamic | `string` | `"Static"` | no |
 | public\_ip\_sku | The SKU of the Public IP. Accepted values are Basic and Standard. Defaults to Basic | `string` | `"Standard"` | no |
 | repository | Terraform current module repo | `string` | `""` | no |
 | resource\_group\_name | A container that holds related resources for an Azure solution | `string` | `""` | no |
+| retention\_policy\_enabled | Is this Retention Policy enabled? | `bool` | `false` | no |
 | scale\_units | The number of scale units with which to provision the Bastion Host. Possible values are between `2` and `50`. `scale_units` only can be changed when `sku` is `Standard`. `scale_units` is always `2` when `sku` is `Basic`. | `number` | `2` | no |
+| storage\_account\_id | The ID of the Storage Account where logs should be sent. | `string` | `null` | no |
 | subnet\_id | The ID of the Subnet where this Network Interface should be located in. | `string` | `""` | no |
 | tags | Additional tags (e.g. map(`BusinessUnit`,`XYZ`). | `map(string)` | `{}` | no |
 | virtual\_network\_name | The name of the virtual network | `string` | `""` | no |
