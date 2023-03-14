@@ -51,4 +51,8 @@ module "bastion" {
   location             = module.resource_group.resource_group_location
   virtual_network_name = module.vnet.vnet_name[0]
   subnet_id            = module.name_specific_subnet.specific_subnet_id[0]
+
+  #### enable diagnostic setting
+  diagnostic_setting_enable  = false
+  log_analytics_workspace_id = ""
 }
