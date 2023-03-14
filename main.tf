@@ -49,3 +49,75 @@ resource "azurerm_bastion_host" "main" {
     public_ip_address_id = join("", azurerm_public_ip.pip.*.id)
   }
 }
+
+resource "azurerm_monitor_diagnostic_setting" "main" {
+  count                          = var.enabled && var.diagnostic_setting_enable ? 1 : 0
+  name                           = format("%s-bastion-diagnostic-log", module.labels.id)
+  target_resource_id             = join("", azurerm_bastion_host.main.*.id)
+  storage_account_id             = var.storage_account_id
+  eventhub_name                  = var.eventhub_name
+  eventhub_authorization_rule_id = var.eventhub_authorization_rule_id
+  log_analytics_workspace_id     = var.log_analytics_workspace_id
+  log_analytics_destination_type = var.log_analytics_destination_type
+  metric {
+    category = "AllMetrics"
+    enabled  = var.Metric_enable
+    retention_policy {
+      enabled = var.retention_policy_enabled
+      days    = var.diagnostic_log_days
+    }
+  }
+  log {
+    category       = var.category
+    category_group = "AllLogs"
+    retention_policy {
+      enabled = var.retention_policy_enabled
+      days    = var.diagnostic_log_days
+    }
+    enabled = var.log_enabled
+  }
+  lifecycle {
+    ignore_changes = [log_analytics_destination_type]
+  }
+}
+
+resource "azurerm_monitor_diagnostic_setting" "pip_bastion" {
+  count                          = var.enabled && var.diagnostic_setting_enable ? 1 : 0
+  name                           = format("%s-bastion-pip-diagnostic-log", module.labels.id)
+  target_resource_id             = join("", azurerm_public_ip.pip.*.id)
+  storage_account_id             = var.storage_account_id
+  eventhub_name                  = var.eventhub_name
+  eventhub_authorization_rule_id = var.eventhub_authorization_rule_id
+  log_analytics_workspace_id     = var.log_analytics_workspace_id
+  log_analytics_destination_type = var.log_analytics_destination_type
+  metric {
+    category = "AllMetrics"
+    enabled  = var.Metric_enable
+    retention_policy {
+      enabled = var.retention_policy_enabled
+      days    = var.diagnostic_log_days
+    }
+  }
+  log {
+    category       = var.category
+    category_group = "AllLogs"
+    retention_policy {
+      enabled = var.retention_policy_enabled
+      days    = var.diagnostic_log_days
+    }
+    enabled = var.log_enabled
+  }
+
+  log {
+    category       = var.category
+    category_group = "Audit"
+    retention_policy {
+      enabled = var.retention_policy_enabled
+      days    = var.diagnostic_log_days
+    }
+    enabled = var.log_enabled
+  }
+  lifecycle {
+    ignore_changes = [log_analytics_destination_type]
+  }
+}
