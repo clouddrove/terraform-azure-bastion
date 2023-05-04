@@ -26,7 +26,7 @@ module "vnet" {
 
 module "name_specific_subnet" {
   source               = "clouddrove/subnet/azure"
-  version              = "1.0.0"
+  version              = "1.0.2"
   name                 = "app"
   environment          = "test"
   label_order          = ["name", "environment"]
