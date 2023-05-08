@@ -43,7 +43,7 @@ module "name_specific_subnet" {
 
 module "bastion" {
   depends_on           = [module.resource_group]
-  source               = "clouddrove/bastion/azure"
+  source               = "./../"
   name                 = "app"
   environment          = "test"
   label_order          = ["name", "environment"]
