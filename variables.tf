@@ -14,7 +14,7 @@ variable "environment" {
 
 variable "label_order" {
   type        = list(any)
-  default     = []
+  default     = ["name", "environment"]
   description = "Label order, e.g. sequence of application name and environment `name`,`environment`,'attribute' [`webserver`,`qa`,`devops`,`public`,] ."
 }
 
