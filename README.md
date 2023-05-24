@@ -75,7 +75,6 @@ Here are some examples of how you can use this module in your inventory structur
   version                             = "1.0.0"
   name                                = "app"
   environment                         = "test"
-  label_order                         = ["name", "environment"]
   resource_group_name                 = module.resource_group.resource_group_name
   azure_bastion_subnet_address_prefix = ["10.0.5.0/24"]
   virtual_network_name                = module.virtual_network.vnet_name[0]
@@ -111,7 +110,7 @@ Here are some examples of how you can use this module in your inventory structur
 | environment | Environment (e.g. `prod`, `dev`, `staging`). | `string` | `""` | no |
 | eventhub\_authorization\_rule\_id | Specifies the ID of an Event Hub Namespace Authorization Rule used to send Diagnostics Data. | `string` | `null` | no |
 | eventhub\_name | Specifies the name of the Event Hub where Diagnostics Data should be sent. | `string` | `null` | no |
-| label\_order | Label order, e.g. sequence of application name and environment `name`,`environment`,'attribute' [`webserver`,`qa`,`devops`,`public`,] . | `list(any)` | `[]` | no |
+| label\_order | Label order, e.g. sequence of application name and environment `name`,`environment`,'attribute' [`webserver`,`qa`,`devops`,`public`,] . | `list(any)` | <pre>[<br>  "name",<br>  "environment"<br>]</pre> | no |
 | location | A location the resources | `string` | `""` | no |
 | log\_analytics\_destination\_type | Possible values are AzureDiagnostics and Dedicated, default to AzureDiagnostics. When set to Dedicated, logs sent to a Log Analytics workspace will go into resource specific tables, instead of the legacy AzureDiagnostics table. | `string` | `"AzureDiagnostics"` | no |
 | log\_analytics\_workspace\_id | n/a | `string` | `null` | no |
