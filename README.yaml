@@ -15,9 +15,12 @@ github_repo: clouddrove/terraform-azure-bastion
 
 # Badges to display
 badges:
-  - name: "Terraform"
-    image: "https://img.shields.io/badge/Terraform-v1.1.7-green"
-    url: "https://www.terraform.io"
+  - name: "Latest Release"
+    image: "https://img.shields.io/github/release/clouddrove/terraform-azure-bastion.svg"
+    url: "https://github.com/clouddrove/terraform-azure-bastion/releases/latest"
+  - name: "tfsec"
+    image: "https://github.com/clouddrove/terraform-azure-bastion/actions/workflows/tfsec.yml/badge.svg"
+    url: "https://github.com/clouddrove/terraform-azure-bastion/actions/workflows/tfsec.yml"
   - name: "Licence"
     image: "https://img.shields.io/badge/License-APACHE-blue.svg"
     url: "LICENSE.md"
@@ -34,16 +37,17 @@ usage: |-
   Here are some examples of how you can use this module in your inventory structure:
   ```hcl
     module "bastion" {
-    source                              = "clouddrove/bastion/azure"
-    version                             = "1.0.0"
-    name                                = "app"
-    environment                         = "test"
-    resource_group_name                 = module.resource_group.resource_group_name
-    azure_bastion_subnet_address_prefix = ["10.0.5.0/24"]
-    virtual_network_name                = module.virtual_network.vnet_name[0]
+    source               = "clouddrove/bastion/azure"
+    version              = "1.0.0"
+    name                 = "app"
+    environment          = "test"
+    resource_group_name  = module.resource_group.resource_group_name
+    location             = module.resource_group.resource_group_location
+    virtual_network_name = module.vnet.vnet_name[0]
+    subnet_id            = module.name_specific_subnet.specific_subnet_id[0]
 
     #### enable diagnostic setting
     diagnostic_setting_enable  = false
     log_analytics_workspace_id = ""
-  }
+    }
   ```

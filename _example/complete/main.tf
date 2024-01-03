@@ -35,12 +35,13 @@ module "name_specific_subnet" {
   specific_name_subnet  = true
   specific_subnet_names = "AzureBastionSubnet"
   subnet_prefixes       = ["10.0.1.0/24"]
+  enable_route_table    = false
 
 }
 
 module "bastion" {
   depends_on           = [module.resource_group]
-  source               = "./../"
+  source               = "./../../"
   name                 = "app"
   environment          = "test"
   resource_group_name  = module.resource_group.resource_group_name

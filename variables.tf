@@ -2,18 +2,18 @@
 #Description : Terraform label module variables.
 variable "name" {
   type        = string
-  default     = ""
+  default     = "app"
   description = "Name  (e.g. `app` or `cluster`)."
 }
 
 variable "environment" {
   type        = string
-  default     = ""
+  default     = "app-test"
   description = "Environment (e.g. `prod`, `dev`, `staging`)."
 }
 
 variable "label_order" {
-  type        = list(any)
+  type        = list(string)
   default     = ["name", "environment"]
   description = "Label order, e.g. sequence of application name and environment `name`,`environment`,'attribute' [`webserver`,`qa`,`devops`,`public`,] ."
 }
@@ -26,26 +26,26 @@ variable "tags" {
 
 variable "managedby" {
   type        = string
-  default     = ""
+  default     = "CloudDrove"
   description = "ManagedBy, eg ''."
 }
 
 
 variable "resource_group_name" {
   type        = string
-  default     = ""
+  default     = null
   description = "A container that holds related resources for an Azure solution"
 }
 
 variable "location" {
   type        = string
-  default     = ""
+  default     = "Canada Central"
   description = "A location the resources"
 }
 
 variable "virtual_network_name" {
   type        = string
-  default     = ""
+  default     = null
   description = "The name of the virtual network"
 }
 
@@ -118,7 +118,7 @@ variable "enabled" {
 
 variable "repository" {
   type        = string
-  default     = ""
+  default     = "https://github.com/clouddrove/terraform-azure-bastion.git"
   description = "Terraform current module repo"
 }
 
@@ -127,9 +127,29 @@ variable "ddos_protection_mode" {
   default     = "VirtualNetworkInherited"
   description = "The DDoS protection mode of the public IP"
 }
+
+variable "ddos_protection_plan_id" {
+  type        = string
+  default     = null
+  description = "The ID of the DDoS protection plan associated with the Public IP"
+}
+
+variable "zone" {
+  type        = string
+  default     = null
+  description = "The Zone for the resources (e.g., `1`, `2`, `3`)."
+}
+
+variable "domain_name_label" {
+  type        = string
+  default     = null
+  description = "The domain name label for the Azure Bastion Service host. Leave empty for no label."
+}
+
+
 variable "subnet_id" {
   type        = string
-  default     = ""
+  default     = null
   description = "The ID of the Subnet where this Network Interface should be located in."
 }
 

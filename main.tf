@@ -8,19 +8,21 @@ module "labels" {
   repository  = var.repository
 }
 
-
 #---------------------------------------------
 # Public IP for Azure Bastion Service
 #---------------------------------------------
 resource "azurerm_public_ip" "pip" {
-  count                = var.enabled ? 1 : 0
-  name                 = format("%s-bastion-ip", module.labels.id)
-  location             = var.location
-  resource_group_name  = var.resource_group_name
-  allocation_method    = var.public_ip_allocation_method
-  sku                  = var.public_ip_sku
-  ddos_protection_mode = var.ddos_protection_mode
-  tags                 = module.labels.tags
+  count                   = var.enabled ? 1 : 0
+  name                    = format("%s-bastion-ip", module.labels.id)
+  location                = var.location
+  resource_group_name     = var.resource_group_name
+  allocation_method       = var.public_ip_allocation_method
+  sku                     = var.public_ip_sku
+  ddos_protection_mode    = var.ddos_protection_mode
+  ddos_protection_plan_id = var.ddos_protection_plan_id
+  zones                   = var.zone != null ? [var.zone] : []
+  domain_name_label       = var.domain_name_label != null ? var.domain_name_label : null
+  tags                    = module.labels.tags
 }
 
 
@@ -46,14 +48,18 @@ resource "azurerm_bastion_host" "main" {
   ip_configuration {
     name                 = format("%s-network", module.labels.id)
     subnet_id            = var.subnet_id
-    public_ip_address_id = join("", azurerm_public_ip.pip.*.id)
+    public_ip_address_id = azurerm_public_ip.pip[0].id
   }
 }
+
+#---------------------------------------------
+# Azure Monitor Diagnostic Settings
+#---------------------------------------------
 
 resource "azurerm_monitor_diagnostic_setting" "main" {
   count                          = var.enabled && var.diagnostic_setting_enable ? 1 : 0
   name                           = format("%s-bastion-diagnostic-log", module.labels.id)
-  target_resource_id             = join("", azurerm_bastion_host.main.*.id)
+  target_resource_id             = azurerm_bastion_host.main[0].id
   storage_account_id             = var.storage_account_id
   eventhub_name                  = var.eventhub_name
   eventhub_authorization_rule_id = var.eventhub_authorization_rule_id
@@ -84,7 +90,7 @@ resource "azurerm_monitor_diagnostic_setting" "main" {
 resource "azurerm_monitor_diagnostic_setting" "pip_bastion" {
   count                          = var.enabled && var.diagnostic_setting_enable ? 1 : 0
   name                           = format("%s-bastion-pip-diagnostic-log", module.labels.id)
-  target_resource_id             = join("", azurerm_public_ip.pip.*.id)
+  target_resource_id             = azurerm_public_ip.pip[0].id
   storage_account_id             = var.storage_account_id
   eventhub_name                  = var.eventhub_name
   eventhub_authorization_rule_id = var.eventhub_authorization_rule_id
