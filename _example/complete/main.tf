@@ -14,12 +14,12 @@ module "resource_group" {
 
 module "vnet" {
   source              = "clouddrove/vnet/azure"
-  version             = "1.0.3"
+  version             = "1.0.4"
   name                = "app"
   environment         = "test"
   resource_group_name = module.resource_group.resource_group_name
   location            = module.resource_group.resource_group_location
-  address_space       = "10.0.0.0/16"
+  address_spaces       = ["10.0.0.0/16"]
 }
 
 module "name_specific_subnet" {
@@ -29,7 +29,7 @@ module "name_specific_subnet" {
   environment          = "test"
   resource_group_name  = module.resource_group.resource_group_name
   location             = module.resource_group.resource_group_location
-  virtual_network_name = join("", module.vnet.vnet_name)
+  virtual_network_name = module.vnet.vnet_name
 
   #subnet
   specific_name_subnet  = true
@@ -46,7 +46,7 @@ module "bastion" {
   environment          = "test"
   resource_group_name  = module.resource_group.resource_group_name
   location             = module.resource_group.resource_group_location
-  virtual_network_name = module.vnet.vnet_name[0]
+  virtual_network_name = module.vnet.vnet_name
   subnet_id            = module.name_specific_subnet.specific_subnet_id[0]
 
   #### enable diagnostic setting
