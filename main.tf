@@ -25,7 +25,6 @@ resource "azurerm_public_ip" "pip" {
   tags                    = module.labels.tags
 }
 
-
 #---------------------------------------------
 # Azure Bastion Service host
 #---------------------------------------------
@@ -44,7 +43,6 @@ resource "azurerm_bastion_host" "main" {
   tunneling_enabled      = var.bastion_host_sku == "Standard" ? var.enable_tunneling : null
   tags                   = module.labels.tags
 
-
   ip_configuration {
     name                 = format("%s-network", module.labels.id)
     subnet_id            = var.subnet_id
@@ -53,10 +51,9 @@ resource "azurerm_bastion_host" "main" {
 }
 
 #---------------------------------------------
-# Azure Monitor Diagnostic Settings
+# Azure Monitor Diagnostic Settings for Bastion
 #---------------------------------------------
-
-resource "azurerm_monitor_diagnostic_setting" "main" {
+resource "azurerm_monitor_diagnostic_setting" "bastion-diagnostic" {
   count                          = var.enabled && var.diagnostic_setting_enable ? 1 : 0
   name                           = format("%s-bastion-diagnostic-log", module.labels.id)
   target_resource_id             = azurerm_bastion_host.main[0].id
@@ -65,29 +62,28 @@ resource "azurerm_monitor_diagnostic_setting" "main" {
   eventhub_authorization_rule_id = var.eventhub_authorization_rule_id
   log_analytics_workspace_id     = var.log_analytics_workspace_id
   log_analytics_destination_type = var.log_analytics_destination_type
-  metric {
-    category = "AllMetrics"
-    enabled  = var.Metric_enable
-    retention_policy {
-      enabled = var.retention_policy_enabled
-      days    = var.diagnostic_log_days
+  dynamic "enabled_log" {
+    for_each = var.log_enabled ? ["allLogs"] : []
+    content {
+      category_group = enabled_log.value
     }
   }
-  log {
-    category       = var.category
-    category_group = "AllLogs"
-    retention_policy {
-      enabled = var.retention_policy_enabled
-      days    = var.diagnostic_log_days
+  dynamic "metric" {
+    for_each = var.metric_enabled ? ["AllMetrics"] : []
+    content {
+      category = metric.value
+      enabled  = true
     }
-    enabled = var.log_enabled
   }
   lifecycle {
     ignore_changes = [log_analytics_destination_type]
   }
 }
 
-resource "azurerm_monitor_diagnostic_setting" "pip_bastion" {
+#---------------------------------------------
+# Azure Monitor Diagnostic Settings for public 
+#---------------------------------------------
+resource "azurerm_monitor_diagnostic_setting" "pip_diagnostic" {
   count                          = var.enabled && var.diagnostic_setting_enable ? 1 : 0
   name                           = format("%s-bastion-pip-diagnostic-log", module.labels.id)
   target_resource_id             = azurerm_public_ip.pip[0].id
@@ -96,34 +92,27 @@ resource "azurerm_monitor_diagnostic_setting" "pip_bastion" {
   eventhub_authorization_rule_id = var.eventhub_authorization_rule_id
   log_analytics_workspace_id     = var.log_analytics_workspace_id
   log_analytics_destination_type = var.log_analytics_destination_type
-  metric {
-    category = "AllMetrics"
-    enabled  = var.Metric_enable
-    retention_policy {
-      enabled = var.retention_policy_enabled
-      days    = var.diagnostic_log_days
+  dynamic "metric" {
+    for_each = var.metric_enabled ? ["AllMetrics"] : []
+    content {
+      category = metric.value
+      enabled  = true
     }
   }
-  log {
-    category       = var.category
-    category_group = "AllLogs"
-    retention_policy {
-      enabled = var.retention_policy_enabled
-      days    = var.diagnostic_log_days
+  dynamic "enabled_log" {
+    for_each = var.pip_logs.enabled ? var.pip_logs.category != null ? var.pip_logs.category : var.pip_logs.category_group : []
+    content {
+      category       = var.pip_logs.category != null ? enabled_log.value : null
+      category_group = var.pip_logs.category == null ? enabled_log.value : null
     }
-    enabled = var.log_enabled
   }
 
-  log {
-    category       = var.category
-    category_group = "Audit"
-    retention_policy {
-      enabled = var.retention_policy_enabled
-      days    = var.diagnostic_log_days
-    }
-    enabled = var.log_enabled
-  }
   lifecycle {
     ignore_changes = [log_analytics_destination_type]
   }
 }
+
+
+
+
+

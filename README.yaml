@@ -47,7 +47,9 @@ usage: |-
     subnet_id            = module.name_specific_subnet.specific_subnet_id[0]
 
     #### enable diagnostic setting
-    diagnostic_setting_enable  = false
+    diagnostic_setting_enable  = true
     log_analytics_workspace_id = ""
     }
   ```
+  
+  

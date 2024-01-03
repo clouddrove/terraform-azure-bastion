@@ -2,16 +2,24 @@ provider "azurerm" {
   features {}
 }
 
-module "resource_group" {
-  source  = "clouddrove/resource-group/azure"
-  version = "1.0.2"
+locals {
+  name        = "app"
+  environment = "test"
+  label_order = ["name", "environment"]
+}
 
+module "resource_group" {
+  source      = "clouddrove/resource-group/azure"
+  version     = "1.0.2"
   name        = "app"
   environment = "test"
   label_order = ["name", "environment"]
   location    = "Canada Central"
 }
 
+##-----------------------------------------------------------------------------
+## Virtual Network module call.
+##-----------------------------------------------------------------------------
 module "vnet" {
   source              = "clouddrove/vnet/azure"
   version             = "1.0.4"
@@ -22,6 +30,9 @@ module "vnet" {
   address_spaces      = ["10.0.0.0/16"]
 }
 
+##-----------------------------------------------------------------------------
+## Subnet module call.
+##-----------------------------------------------------------------------------
 module "name_specific_subnet" {
   source               = "clouddrove/subnet/azure"
   version              = "1.0.2"
@@ -38,7 +49,9 @@ module "name_specific_subnet" {
   enable_route_table    = false
 
 }
-
+##-----------------------------------------------------------------------------
+## Bastion module call.
+##-----------------------------------------------------------------------------
 module "bastion" {
   depends_on           = [module.resource_group]
   source               = "./../../"
@@ -49,7 +62,9 @@ module "bastion" {
   virtual_network_name = module.vnet.vnet_name
   subnet_id            = module.name_specific_subnet.specific_subnet_id[0]
 
-  #### enable diagnostic setting
-  diagnostic_setting_enable  = false
-  log_analytics_workspace_id = ""
+  ##-----------------------------------------------------------------------------
+  ## enable diagnostic setting
+  ##-----------------------------------------------------------------------------
+  diagnostic_setting_enable = false
+
 }
