@@ -18,11 +18,6 @@ variable "label_order" {
   description = "Label order, e.g. sequence of application name and environment `name`,`environment`,'attribute' [`webserver`,`qa`,`devops`,`public`,] ."
 }
 
-variable "tags" {
-  type        = map(string)
-  default     = {}
-  description = "Additional tags (e.g. map(`BusinessUnit`,`XYZ`)."
-}
 
 variable "managedby" {
   type        = string
@@ -43,12 +38,6 @@ variable "location" {
   description = "A location the resources"
 }
 
-variable "virtual_network_name" {
-  type        = string
-  default     = null
-  description = "The name of the virtual network"
-}
-
 variable "public_ip_allocation_method" {
   type        = string
   default     = "Static"
@@ -62,11 +51,6 @@ variable "public_ip_sku" {
   description = "The SKU of the Public IP. Accepted values are Basic and Standard. Defaults to Basic"
 }
 
-variable "azure_bastion_subnet_address_prefix" {
-  type        = list(any)
-  default     = []
-  description = "The address prefix to use for the Azure Bastion subnet"
-}
 
 variable "enable_copy_paste" {
   type        = bool
@@ -159,23 +143,6 @@ variable "log_analytics_destination_type" {
   description = "Possible values are AzureDiagnostics and Dedicated, default to AzureDiagnostics. When set to Dedicated, logs sent to a Log Analytics workspace will go into resource specific tables, instead of the legacy AzureDiagnostics table."
 }
 
-variable "retention_policy_enabled" {
-  type        = bool
-  default     = false
-  description = "Is this Retention Policy enabled?"
-}
-
-variable "diagnostic_log_days" {
-  type        = number
-  default     = "90"
-  description = " The number of days for which this Retention Policy should apply."
-}
-
-variable "Metric_enable" {
-  type        = bool
-  default     = true
-  description = "Is this Diagnostic Metric enabled? Defaults to true."
-}
 
 variable "diagnostic_setting_enable" {
   type    = bool
@@ -187,11 +154,6 @@ variable "log_analytics_workspace_id" {
   default = null
 }
 
-variable "category" {
-  type        = string
-  default     = null
-  description = " The name of a Diagnostic Log Category Group for this Resource."
-}
 
 variable "log_enabled" {
   type        = string
