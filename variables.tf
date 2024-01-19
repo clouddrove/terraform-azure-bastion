@@ -195,5 +195,6 @@ variable "pip_logs" {
   default = {
     enabled        = true
     category_group = ["AllLogs"]
+    description    = "Is this Diagnostic logs enabled? Defaults to True."
   }
 }

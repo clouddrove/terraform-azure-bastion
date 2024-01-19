@@ -85,7 +85,7 @@ resource "azurerm_monitor_diagnostic_setting" "bastion-diagnostic" {
 #---------------------------------------------
 resource "azurerm_monitor_diagnostic_setting" "pip_diagnostic" {
   count                          = var.enabled && var.diagnostic_setting_enable ? 1 : 0
-  name                           = format("%s-bastion-pip-diagnostic-log", module.labels.id)
+  name                           = format("%s-bastion_test-pip-diagnostic-log", module.labels.id)
   target_resource_id             = azurerm_public_ip.pip[0].id
   storage_account_id             = var.storage_account_id
   eventhub_name                  = var.eventhub_name
