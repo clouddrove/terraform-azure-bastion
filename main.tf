@@ -8,21 +8,22 @@ module "labels" {
   repository  = var.repository
 }
 
-
 #---------------------------------------------
 # Public IP for Azure Bastion Service
 #---------------------------------------------
 resource "azurerm_public_ip" "pip" {
-  count                = var.enabled ? 1 : 0
-  name                 = format("%s-bastion-ip", module.labels.id)
-  location             = var.location
-  resource_group_name  = var.resource_group_name
-  allocation_method    = var.public_ip_allocation_method
-  sku                  = var.public_ip_sku
-  ddos_protection_mode = var.ddos_protection_mode
-  tags                 = module.labels.tags
+  count                   = var.enabled ? 1 : 0
+  name                    = format("%s-bastion-ip", module.labels.id)
+  location                = var.location
+  resource_group_name     = var.resource_group_name
+  allocation_method       = var.public_ip_allocation_method
+  sku                     = var.public_ip_sku
+  ddos_protection_mode    = var.ddos_protection_mode
+  ddos_protection_plan_id = var.ddos_protection_plan_id
+  zones                   = var.zone != null ? [var.zone] : []
+  domain_name_label       = var.domain_name_label != null ? var.domain_name_label : null
+  tags                    = module.labels.tags
 }
-
 
 #---------------------------------------------
 # Azure Bastion Service host
@@ -42,82 +43,76 @@ resource "azurerm_bastion_host" "main" {
   tunneling_enabled      = var.bastion_host_sku == "Standard" ? var.enable_tunneling : null
   tags                   = module.labels.tags
 
-
   ip_configuration {
     name                 = format("%s-network", module.labels.id)
     subnet_id            = var.subnet_id
-    public_ip_address_id = join("", azurerm_public_ip.pip.*.id)
+    public_ip_address_id = azurerm_public_ip.pip[0].id
   }
 }
 
-resource "azurerm_monitor_diagnostic_setting" "main" {
+#---------------------------------------------
+# Azure Monitor Diagnostic Settings for Bastion
+#---------------------------------------------
+resource "azurerm_monitor_diagnostic_setting" "bastion-diagnostic" {
   count                          = var.enabled && var.diagnostic_setting_enable ? 1 : 0
   name                           = format("%s-bastion-diagnostic-log", module.labels.id)
-  target_resource_id             = join("", azurerm_bastion_host.main.*.id)
+  target_resource_id             = azurerm_bastion_host.main[0].id
   storage_account_id             = var.storage_account_id
   eventhub_name                  = var.eventhub_name
   eventhub_authorization_rule_id = var.eventhub_authorization_rule_id
   log_analytics_workspace_id     = var.log_analytics_workspace_id
   log_analytics_destination_type = var.log_analytics_destination_type
-  metric {
-    category = "AllMetrics"
-    enabled  = var.Metric_enable
-    retention_policy {
-      enabled = var.retention_policy_enabled
-      days    = var.diagnostic_log_days
+  dynamic "enabled_log" {
+    for_each = var.log_enabled ? ["allLogs"] : []
+    content {
+      category_group = enabled_log.value
     }
   }
-  log {
-    category       = var.category
-    category_group = "AllLogs"
-    retention_policy {
-      enabled = var.retention_policy_enabled
-      days    = var.diagnostic_log_days
+  dynamic "metric" {
+    for_each = var.metric_enabled ? ["AllMetrics"] : []
+    content {
+      category = metric.value
+      enabled  = true
     }
-    enabled = var.log_enabled
   }
   lifecycle {
     ignore_changes = [log_analytics_destination_type]
   }
 }
 
-resource "azurerm_monitor_diagnostic_setting" "pip_bastion" {
+#---------------------------------------------
+# Azure Monitor Diagnostic Settings for public 
+#---------------------------------------------
+resource "azurerm_monitor_diagnostic_setting" "pip_diagnostic" {
   count                          = var.enabled && var.diagnostic_setting_enable ? 1 : 0
-  name                           = format("%s-bastion-pip-diagnostic-log", module.labels.id)
-  target_resource_id             = join("", azurerm_public_ip.pip.*.id)
+  name                           = format("%s-bastion_test-pip-diagnostic-log", module.labels.id)
+  target_resource_id             = azurerm_public_ip.pip[0].id
   storage_account_id             = var.storage_account_id
   eventhub_name                  = var.eventhub_name
   eventhub_authorization_rule_id = var.eventhub_authorization_rule_id
   log_analytics_workspace_id     = var.log_analytics_workspace_id
   log_analytics_destination_type = var.log_analytics_destination_type
-  metric {
-    category = "AllMetrics"
-    enabled  = var.Metric_enable
-    retention_policy {
-      enabled = var.retention_policy_enabled
-      days    = var.diagnostic_log_days
+  dynamic "metric" {
+    for_each = var.metric_enabled ? ["AllMetrics"] : []
+    content {
+      category = metric.value
+      enabled  = true
     }
   }
-  log {
-    category       = var.category
-    category_group = "AllLogs"
-    retention_policy {
-      enabled = var.retention_policy_enabled
-      days    = var.diagnostic_log_days
+  dynamic "enabled_log" {
+    for_each = var.pip_logs.enabled ? var.pip_logs.category != null ? var.pip_logs.category : var.pip_logs.category_group : []
+    content {
+      category       = var.pip_logs.category != null ? enabled_log.value : null
+      category_group = var.pip_logs.category == null ? enabled_log.value : null
     }
-    enabled = var.log_enabled
   }
 
-  log {
-    category       = var.category
-    category_group = "Audit"
-    retention_policy {
-      enabled = var.retention_policy_enabled
-      days    = var.diagnostic_log_days
-    }
-    enabled = var.log_enabled
-  }
   lifecycle {
     ignore_changes = [log_analytics_destination_type]
   }
 }
+
+
+
+
+
