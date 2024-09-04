@@ -8,11 +8,11 @@ jobs:
    complete-example:
     uses: clouddrove/github-shared-workflows/.github/workflows/tf-checks.yml@1.2.4
     with:
-      working_directory: './_example/complete/'
+      working_directory: './examples/complete/'
      
    basic-example:
     uses: clouddrove/github-shared-workflows/.github/workflows/tf-checks.yml@1.2.4
     with:
-      working_directory: './_example/basic/'
+      working_directory: './examples/basic/'
 
   
