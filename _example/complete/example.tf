@@ -72,7 +72,7 @@ module "log-analytics" {
   internet_query_enabled           = true
   resource_group_name              = module.resource_group.resource_group_name
   log_analytics_workspace_location = module.resource_group.resource_group_location
-  log_analytics_workspace_id = module.log-analytics.workspace_id
+  log_analytics_workspace_id       = module.log-analytics.workspace_id
 }
 
 ##-----------------------------------------------------------------------------
