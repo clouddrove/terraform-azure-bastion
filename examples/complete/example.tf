@@ -1,5 +1,6 @@
 provider "azurerm" {
   features {}
+  subscription_id = "000000-11111-1223-XXX-XXXXXXXXXXXX"
 }
 
 locals {
@@ -39,7 +40,7 @@ module "vnet" {
 ##-----------------------------------------------------------------------------
 module "name_specific_subnet" {
   source               = "clouddrove/subnet/azure"
-  version              = "1.1.0"
+  version              = "1.2.1"
   name                 = "app"
   environment          = "test"
   resource_group_name  = module.resource_group.resource_group_name
@@ -60,7 +61,7 @@ module "name_specific_subnet" {
 ##-----------------------------------------------------------------------------
 module "log-analytics" {
   source                           = "clouddrove/log-analytics/azure"
-  version                          = "1.0.1"
+  version                          = "1.1.0"
   name                             = local.name
   environment                      = local.environment
   label_order                      = local.label_order
@@ -71,6 +72,7 @@ module "log-analytics" {
   internet_query_enabled           = true
   resource_group_name              = module.resource_group.resource_group_name
   log_analytics_workspace_location = module.resource_group.resource_group_location
+  log_analytics_workspace_id       = module.log-analytics.workspace_id
 }
 
 ##-----------------------------------------------------------------------------
