@@ -81,7 +81,7 @@ resource "azurerm_monitor_diagnostic_setting" "bastion-diagnostic" {
 }
 
 #---------------------------------------------
-# Azure Monitor Diagnostic Settings for public 
+# Azure Monitor Diagnostic Settings for public
 #---------------------------------------------
 resource "azurerm_monitor_diagnostic_setting" "pip_diagnostic" {
   count                          = var.enabled && var.diagnostic_setting_enable ? 1 : 0
@@ -111,8 +111,3 @@ resource "azurerm_monitor_diagnostic_setting" "pip_diagnostic" {
     ignore_changes = [log_analytics_destination_type]
   }
 }
-
-
-
-
-

@@ -40,4 +40,3 @@
 |------|-------------|
 | dns\_name | Specifies the name of the bastion host |
 | id | Specifies the resource id of the bastion host |
-
