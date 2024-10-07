@@ -7,8 +7,3 @@ output "bastion_id" {
   value       = module.bastion.id
   description = "Specifies the name of the bastion host"
 }
-
-
-
-
-

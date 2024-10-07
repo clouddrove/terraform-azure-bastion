@@ -55,9 +55,9 @@ module "name_specific_subnet" {
 
 }
 
-##----------------------------------------------------------------------------- 
+##-----------------------------------------------------------------------------
 ## Log Analytics module call.
-## Log analytics workspace in which storage diagnostic logs will be sent. 
+## Log analytics workspace in which storage diagnostic logs will be sent.
 ##-----------------------------------------------------------------------------
 module "log-analytics" {
   source                           = "clouddrove/log-analytics/azure"
